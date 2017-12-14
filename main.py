@@ -11,6 +11,7 @@ import logging
 import json
 import webbrowser
 from string import ascii_lowercase
+from GmailDotEmailGenerator import GmailDotEmailGenerator
 
 
 from utils import n_logging, c_logging
@@ -170,28 +171,29 @@ if __name__ == '__main__':
     _thread.start_new_thread(app.run, ())
     _thread.start_new_thread(manageTokens, ())
     accountsList = []
-    n_logging("Adidas Account Creator v1.0.0")
+    n_logging("Adidas Account Creator v1.0.1")
     n_logging("@TheRealChefUK")
-    n_logging("Adjusted by Jennis for the German Connec Discord")
+    n_logging("Adjusted by Jennis and Sunny")
     n_logging("***************************************************************************")
-    creator = Generator(config['locale'], '6LdyFRkUAAAAAF2YmQ9baZ6ytpVnbVSAymVpTXKi', 'https://www.adidas.com')
+    gmail = input("Enter Gmail:")
     num = input("# ACCOUNTS: ")
+    creator = Generator(config['locale'], '6LdyFRkUAAAAAF2YmQ9baZ6ytpVnbVSAymVpTXKi', 'https://www.adidas.com')
     webbrowser.open('http://germanconnec.adidas.de:5000/solve')
     n_logging("Started account generator.")
-    for x in range(int(num)):
-        email = '{}{}@{}'.format(random_char(5), randint(1111, 999999), config['domain'])
+    for email in \
+(GmailDotEmailGenerator(gmail).generate())[:int(num)]:
         allchar = string.ascii_letters + string.digits
         passw = config ['password']
-        n_logging("Task {} - Waiting for captcha token.".format(x))
+        n_logging("Task {} - Waiting for captcha token.".format(email))
         # token = creator.fetch_token()
         token = sendToken()
-        n_logging("Task {} - Obtained captcha token.".format(x))
+        n_logging("Task {} - Obtained captcha token.".format(email))
         result, account = creator.create_account(email, passw, token)
         if result:
-            n_logging("Task {} - Created account {}".format(x, account))
+            n_logging("Task {} - Created account {}".format(email, account))
             accountsList.append(account)
         else:
-            n_logging("Task {} - Failed to create account.".format(x))
+            n_logging("Task {} - Failed to create account.".format(email))
     with open('accounts.txt', 'w') as file:
         for item in accountsList:
             file.write('{}\n'.format(item))
